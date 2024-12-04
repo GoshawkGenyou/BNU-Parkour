@@ -50,7 +50,8 @@ public class GroundSpawner : MonoBehaviour
         // Check the front tile in the queue (first tile) to see if it needs to be repositioned
         if (activeTiles.Count > 0 && activeTiles.Peek().transform.position.z < despawnZPosition)
         {
-            RepositionTile(activeTiles.Dequeue()); // Remove tile from front and reposition it
+            float z = activeTiles.Peek().transform.position.z;
+            RepositionTile(activeTiles.Dequeue(), z); // Remove tile from front and reposition it
         }
     }
 
@@ -61,10 +62,10 @@ public class GroundSpawner : MonoBehaviour
         activeTiles.Enqueue(newTile); // Add new tile to the queue
     }
 
-    void RepositionTile(GameObject tile)
+    void RepositionTile(GameObject tile, float offset)
     {
-        // Reposition the tile at the far end of the ground line (spawnZPosition)
-        tile.transform.position = new Vector3(0, 0, spawnZPosition);
+        // Reposition the tile at the far end of the ground line (spawnZPosition) with offset in case of exceeding limit and gap
+        tile.transform.position = new Vector3(0, 0, spawnZPosition + offset);
         activeTiles.Enqueue(tile); // Add the repositioned tile to the back of the queue
     }
 }
