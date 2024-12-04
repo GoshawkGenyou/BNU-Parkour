@@ -4,93 +4,69 @@ using UnityEngine;
 
 public class GameTimeManager : MonoBehaviour
 {
-    public float tickInterval = 0.05f; // Initial time interval for each tick (in seconds)
     public float gameTime = 10f;
     public float score = 0f;
     public bool isGameOver = false;
+    public int difficulty = 0;
 
-    private float timeSinceLastTick = 0f; // Tracks time since last tick
-    private int ticksSinceLastMultiplierIncrease = 0; // Ticks since last multiplier increase
-    private int currentTick = 0; // The current tick number
-
-    public float speedMultiplier = 3.0f; // Current speed multiplier
+    public float speedMultiplier = 1.0f; // Current speed multiplier
     private float minSpeedMultiplier = 1f;
-    private float maxSpeedMultiplier = 7.0f; // Maximum speed multiplier
+    private float maxSpeedMultiplier = 12.0f; // Maximum speed multiplier
     public float multiplierIncrement = 0.1f; // Increment value for the multiplier
 
-    private float timeElapsed = 0f; // Tracks the total time passed in the game
+    public float timeElapsed = 0f; // Tracks the total time passed in the game
+    private int ticksSinceLastMultiplierIncrease = 0; // Track how many frames have passed for multiplier logic
 
     public float multiplierIncreaseTime = 1f; // Time intervals after which the speed multiplier should increase (e.g., 60s)
 
-    public int ticksToMultiplierIncrease = 5; // Initial ticks for multiplier increase
-    public int maxTicksToMultiplierIncrease = 200; // Maximum ticks for multiplier increase
+    public int ticksToMultiplierIncrease = 600; // Initial ticks for multiplier increase
+    public int maxTicksToMultiplierIncrease = 2000; // Maximum ticks for multiplier increase
 
-    public CameraUI cameraUI; // Reference to CameraUI to pass data for UI updates
+    public GroundSpawner gSpawner;
 
-    void Start()
-    {
-        StartCoroutine(TickUpdate());
-    }
-
-    // Coroutine to handle tick updates
-    IEnumerator TickUpdate()
-    {
-        float fixedElapsedTime = 0f; // Tracks total fixed elapsed time
-
-        while (!isGameOver)
-        {
-            yield return null; // Wait for the next frame
-
-            // Increment fixedElapsedTime by real-world delta time
-            fixedElapsedTime += Time.deltaTime;
-
-            // If enough time has elapsed for a tick, trigger a tick
-            while (fixedElapsedTime >= tickInterval)
-            {
-                fixedElapsedTime -= tickInterval; // Subtract the tick interval
-                OnTick(); // Trigger game tick logic
-            }
-        }
-    }
-
-    // This function is called on every tick
-    void OnTick()
+    void Update()
     {
         if (isGameOver)
         {
-            return;
+            return; // Don't update game logic if game is over
         }
-        currentTick++; // debug
-        if (currentTick > 100) // Arbitrary value
-        {
-            currentTick = 0; // Reset to avoid overflow
-        }
-        timeElapsed += tickInterval; // Update the total time elapsed in the game
-        gameTime -= tickInterval;
+
+        // Update the game time based on elapsed time
+        timeElapsed += Time.deltaTime;
+        gameTime -= Time.deltaTime;
+
+        // Increase score based on speed multiplier and time passed
+        score += Time.deltaTime * speedMultiplier;
+
         ticksSinceLastMultiplierIncrease++;
 
-        score += tickInterval * speedMultiplier;
+        if (speedMultiplier > 3 && difficulty < 1)
+        {
+            difficulty++;
+            gSpawner.incDiffulculty();
+        }
 
-        // Update the speed multiplier if necessary
+        if (speedMultiplier > 10 && difficulty < 2)
+        {
+            difficulty++;
+            gSpawner.incDiffulculty();
+        }
+
+
+        // Update the speed multiplier based on the elapsed time
         UpdateSpeedMultiplier();
 
-        // Notify CameraUI about the game status (to update UI elements)
-        if (cameraUI != null)
-        {
-            cameraUI.UpdateUI();
-        }
 
+        // Check for game over condition
         if (gameTime <= 0)
         {
-            isGameOver = true;
             EndGame();
         }
-
-        Debug.Log($"Tick: {currentTick}, Multiplier: {speedMultiplier}, Next Increase At: {ticksToMultiplierIncrease}");
     }
 
     void UpdateSpeedMultiplier()
     {
+        // Logic to increase the multiplier at regular intervals
         if (ticksSinceLastMultiplierIncrease >= ticksToMultiplierIncrease)
         {
             ticksSinceLastMultiplierIncrease = 0; // Reset the tick counter
@@ -99,10 +75,30 @@ public class GameTimeManager : MonoBehaviour
             speedMultiplier = Mathf.Min(speedMultiplier + multiplierIncrement, maxSpeedMultiplier);
 
             // Gradually increase the ticks required for the next multiplier increase
-            ticksToMultiplierIncrease = Mathf.Min(ticksToMultiplierIncrease + 10, maxTicksToMultiplierIncrease);
+            ticksToMultiplierIncrease = Mathf.Min(ticksToMultiplierIncrease + 100, maxTicksToMultiplierIncrease);
+        }
+
+        if (speedMultiplier > 3.0f)
+        {
+            minSpeedMultiplier = 3.0f;
         }
     }
 
+    public void AddTimeOnReward()
+    {
+        if (speedMultiplier < 3f)
+        {
+            gameTime += 10f;
+        }
+        else if (speedMultiplier < 6f)
+        {
+            gameTime += 5f;
+        }
+        else
+        {
+            gameTime += 2f;
+        }
+    }
 
     public void SlowDownOnCollision()
     {
@@ -116,19 +112,20 @@ public class GameTimeManager : MonoBehaviour
         float originalMultiplier = speedMultiplier;
 
         Time.timeScale = 0.5f; // Slow down time
-        speedMultiplier = Mathf.Max(speedMultiplier - 0.5f, minSpeedMultiplier); // Reduce multiplier but keep it >= minSpeed
+        speedMultiplier *= 0.8f;
+        speedMultiplier = Mathf.Round(speedMultiplier * 10f) / 10f;
+        speedMultiplier = Mathf.Max(speedMultiplier, minSpeedMultiplier); // Reduce multiplier but keep it >= minSpeed
 
         yield return new WaitForSecondsRealtime(1f); // Wait for 1 second in real time
 
         // Restore original time scale and multiplier
         Time.timeScale = originalTimeScale;
-        speedMultiplier = originalMultiplier;
     }
 
     void EndGame()
     {
-        Debug.Log("Game Over");
-        // Handle game-over logic here (e.g., show game-over screen)
-    }
+        isGameOver = true;
 
+        Debug.Log("Game Over");
+    }
 }

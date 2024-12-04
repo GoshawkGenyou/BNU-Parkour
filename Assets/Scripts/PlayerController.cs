@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     public float rotationSpeed = 5f;  // Speed at which the character rotates
     private Animator animator;  // Reference to the Animator
     private float moveInput;    // Store input from player
+    public GameTimeManager gameTimeManager;
 
     void Start()
     {
@@ -16,6 +17,10 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (gameTimeManager.isGameOver)
+        {
+            return;
+        }
         // Get horizontal input (A/D or left arrow/right arrow)
         moveInput = Input.GetAxisRaw("Horizontal");
 

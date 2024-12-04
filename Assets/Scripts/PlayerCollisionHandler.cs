@@ -12,9 +12,9 @@ public class PlayerCollisionHandler : MonoBehaviour
 
     private bool isImmune = false;
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.gameObject.CompareTag("Obstacle") && !isImmune)
+        if (other.gameObject.CompareTag("Obstacle") && !isImmune)
         {
             Debug.Log("Player hit an obstacle!");
 
@@ -26,6 +26,20 @@ public class PlayerCollisionHandler : MonoBehaviour
 
             // Start immunity period
             StartCoroutine(HandleImmunity());
+        }
+
+        if (other.gameObject.CompareTag("Reward") && !isImmune)
+        {
+            Debug.Log("Player collected a reward!");
+
+            // Add time when the player collects a reward (you can modify the amount of time added)
+            if (gameTimeManager != null)
+            {
+                gameTimeManager.AddTimeOnReward();  // Ensure this method is implemented in your GameTimeManager
+            }
+
+            // Optionally, destroy the reward object after collection
+            Destroy(other.gameObject);  // You can remove this line if you want to keep rewards in the scene
         }
     }
 
