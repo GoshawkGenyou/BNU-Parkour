@@ -67,7 +67,11 @@ public class GameTimeManager : MonoBehaviour
         {
             return;
         }
-        currentTick++;
+        currentTick++; // debug
+        if (currentTick > 100) // Arbitrary value
+        {
+            currentTick = 0; // Reset to avoid overflow
+        }
         timeElapsed += tickInterval; // Update the total time elapsed in the game
         gameTime -= tickInterval;
         ticksSinceLastMultiplierIncrease++;

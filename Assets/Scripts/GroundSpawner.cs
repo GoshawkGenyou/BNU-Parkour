@@ -7,7 +7,7 @@ public class GroundSpawner : MonoBehaviour
 {
     public GameObject groundTilePrefab; // Prefab for the ground tile/platform
     public float tileWidth = 4f; // The width of each platform tile
-    public float tileSpeed = 80f; // How fast the tiles move towards the player
+    public float tileSpeed = 5f; // How fast the tiles move towards the player
     public int initialTileCount = 10; // Number of tiles to spawn initially
 
     private Queue<GameObject> activeTiles = new Queue<GameObject>(); // Queue to store active tiles

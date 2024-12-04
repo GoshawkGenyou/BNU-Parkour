@@ -346,7 +346,7 @@ MonoBehaviour:
   groundTilePrefab: {fileID: 1757715471452354361, guid: a1b408fd8a3585c4d828956db4dcd042,
     type: 3}
   tileWidth: 4
-  tileSpeed: 1
+  tileSpeed: 3
   initialTileCount: 10
   gameTimeManager: {fileID: 444067683}
 --- !u!4 &196648480
@@ -521,7 +521,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tickInterval: 0.1
-  gameTime: 10
+  gameTime: 25
   score: 0
   isGameOver: 0
   speedMultiplier: 1
