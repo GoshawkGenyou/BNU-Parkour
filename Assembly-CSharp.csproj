@@ -58,6 +58,7 @@
     <Compile Include="Assets\Scripts\CameraUI.cs" />
     <Compile Include="Assets\Scripts\GameTimeManager.cs" />
     <Compile Include="Assets\Scripts\GroundSpawner.cs" />
+    <Compile Include="Assets\Scripts\PlayerCollisionHandler.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
     <None Include="Assets\Models\Hologram.shader" />
     <Reference Include="UnityEngine.Purchasing">

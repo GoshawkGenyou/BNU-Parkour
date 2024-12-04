@@ -1,8 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.UI;
 
 public class GameTimeManager : MonoBehaviour
 {
@@ -27,12 +25,7 @@ public class GameTimeManager : MonoBehaviour
     public int ticksToMultiplierIncrease = 5; // Initial ticks for multiplier increase
     public int maxTicksToMultiplierIncrease = 200; // Maximum ticks for multiplier increase
 
-
-    // UI Elements
-    public Text speedText;
-    public Text timeText;
-    public Text scoreText;
-
+    public CameraUI cameraUI; // Reference to CameraUI to pass data for UI updates
 
     void Start()
     {
@@ -81,10 +74,11 @@ public class GameTimeManager : MonoBehaviour
         // Update the speed multiplier if necessary
         UpdateSpeedMultiplier();
 
-        // Update the UI Text with the current speed multiplier
-        UpdateUIText();
-
-        
+        // Notify CameraUI about the game status (to update UI elements)
+        if (cameraUI != null)
+        {
+            cameraUI.UpdateUI();
+        }
 
         if (gameTime <= 0)
         {
@@ -129,25 +123,6 @@ public class GameTimeManager : MonoBehaviour
         // Restore original time scale and multiplier
         Time.timeScale = originalTimeScale;
         speedMultiplier = originalMultiplier;
-    }
-
-    void UpdateUIText()
-    {
-        // Set the speed multiplier text to display the current value
-        if (speedText != null)
-        {
-            speedText.text = "Speed: " + speedMultiplier.ToString("F2"); // Display with 2 decimal points
-        }
-
-        if (timeText != null)
-        {
-            timeText.text = "Time Remaining: " + gameTime.ToString("F1");
-        }
-
-        if (scoreText != null)
-        {
-            scoreText.text = "Score: " + score.ToString("F0");
-        }
     }
 
     void EndGame()
